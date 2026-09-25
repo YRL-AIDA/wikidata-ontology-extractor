@@ -70,7 +70,7 @@ Data snapshot as of **2026**:
 | 🎯 Properties with domain constraints | 9,045 (23,020 links) |
 | 🎯 Properties with range constraints | 1,267 (6,509 links) |
 
-## :file_folder: Repository Structure
+## 📁 Repository Structure
 
 ```text
 wikidata-ontology-extractor/
@@ -307,7 +307,7 @@ The data is extracted from [Wikidata](https://www.wikidata.org/) and is distribu
 
 The project code is distributed under the MIT license.
 
-## :writing_hand: Authors
+## ✍ Authors
 
 * [Nikita O. Dorodnykh](mailto:nikidorny@icc.ru)
 * [Kirill V. Tobola](mailto:kirilltobola@icc.ru)
