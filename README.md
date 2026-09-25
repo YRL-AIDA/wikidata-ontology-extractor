@@ -6,8 +6,6 @@ Extraction of an **ontological schema** from [Wikidata](https://www.wikidata.org
 ![Data](https://img.shields.io/badge/Data-Wikidata-green)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
----
-
 ## 📋 Table of Contents
 
 - [Motivation](#-motivation)
@@ -22,31 +20,27 @@ Extraction of an **ontological schema** from [Wikidata](https://www.wikidata.org
 - [License and Sources](#-license-and-sources)
 - [Authors](#-authors)
 
----
-
 ## 🎯 Motivation
 
 For **semantic table interpretation** (mapping columns to classes, and relations between columns to ontology properties), a complete and clean ontological schema is required. Wikidata is the largest open knowledge graph, but:
 
-- ❌ "Raw" Wikidata contains **metaclasses** and **system entities** (categories, templates, disambiguation pages) that interfere with interpretation
+- ❌ "*Raw*" Wikidata contains **metaclasses** and **system entities** (categories, templates, disambiguation pages) that interfere with interpretation
 - ❌ The SPARQL endpoint cannot handle bulk queries (timeouts, 429 rate limiting)
 - ❌ Full Wikidata dumps occupy 50–100 GB
 
 **Solution**: a hybrid pipeline that uses prebuilt binary files from [zelph](https://zelph.org/) for the class hierarchy and targeted queries for properties.
 
----
-
 ## 📦 What Is Extracted
 
 ### Classes (`subClassOf` hierarchy / P279)
 
-| Attribute | Description |
-|-----------|-------------|
-| `id` | Q-identifier (e.g., `Q6256`) |
-| `label_en` / `label_ru` | Label in English and Russian |
-| `description_en` / `description_ru` | Description in English and Russian |
-| `ancestors` | All superclasses (transitive closure) |
-| `edges` | Direct subclass relations |
+| Attribute | Description                             |
+|-----------|-----------------------------------------|
+| `id` | Q-identifier (e.g., `Q6256`)            |
+| `label_en` / `label_ru` | Label in English and Russian            |
+| `description_en` / `description_ru` | Description in English and Russian      |
+| `ancestors` | All superclasses (*transitive closure*) |
+| `edges` | Direct subclass relations               |
 
 ### Properties (full schema)
 
@@ -56,29 +50,25 @@ For **semantic table interpretation** (mapping columns to classes, and relations
 | `label_en` / `label_ru` | Label |
 | `description_en` / `description_ru` | Description |
 | `datatype` | Data type (`WikibaseItem`, `Quantity`, `Time`, etc.) |
-| `superproperties` / `subproperties` | Property hierarchy (P1647) |
+| `superproperties` / `subproperties` | Property hierarchy (`P1647`) |
 | `domain` | Classes the property applies to |
 | `range` | Classes of property values |
-| `inverse` | Inverse property (P1696) |
-
----
+| `inverse` | Inverse property (`P1696`) |
 
 ## 📊 Results
 
 Data snapshot as of **2026**:
 
-| Component | Value |
-|-----------|-------|
-| 🏛 Topical classes | **582,467** |
-| 🔗 Subclass relations | **669,213** |
-| 🚫 Excluded metaclasses | 307,503 |
-| ⚙️ Properties | **13,928** |
-| 🇬🇧 Properties with English labels | 13,926 (100%) |
-| 🇷🇺 Properties with Russian labels | 9,066 (65%) |
+| Component | Value              |
+|-----------|--------------------|
+| 🏛 Topical classes | 582,467            |
+| 🔗 Subclass relations | 669,213            |
+| 🚫 Excluded metaclasses | 307,503            |
+| ⚙️ Properties | 13,928             |
+| 🇬🇧 Properties with English labels | 13,926 (100%)      |
+| 🇷🇺 Properties with Russian labels | 9,066 (65%)        |
 | 🎯 Properties with domain constraints | 9,045 (23,020 links) |
 | 🎯 Properties with range constraints | 1,267 (6,509 links) |
-
----
 
 ## :file_folder: Repository Structure
 
@@ -106,37 +96,33 @@ wikidata-ontology-extractor/
 └── requirements.txt                                  # 
 ```
 
----
-
 ## 🏗 Pipeline Architecture
 
 **STEP 1: Class hierarchy**
-- Source: zelph file wikidata-20260309-all-pruned-small-P279.bin
-- Export via zelph REPL → hierarchy_export.txt
-- Filter metaclasses (transitively from roots)
-- Result: class_schema.json
+- Source: zelph file `wikidata-20260309-all-pruned-small-P279.bin`
+- Export via zelph REPL → `hierarchy_export.txt`
+- Filter metaclasses (*transitively from roots*)
+- Result: `class_schema.json`
 
 **STEP 2: Class labels and descriptions**
 - Source: Wikidata wbgetentities REST API
 - Batches of 50, progress caching
-- Result: class_schema_with_labels_and_descriptions.json
+- Result: `class_schema_with_labels_and_descriptions.json`
 
 **STEP 3: Property schema**
 - Source: SPARQL endpoint + wbgetentities API
-- Hierarchy (P1647), domain (Q21503250+P2308), range, inverse
+- Hierarchy (`P1647`), domain (`Q21503250`+`P2308`), range, inverse
 - Rate limiting: 70-second pauses between queries
-- Result: properties_schema_with_labels.json
-
----
+- Result: `properties_schema_with_labels.json`
 
 ## 💻 Installation
 
 ### Requirements
 
 - **Python 3.8+**
-- **~5 GB** of free disk space (for the data)
-- **~8 GB** of RAM (for processing large files)
-- A stable internet connection (for collecting labels and properties)
+- **~5 GB** of free disk space (*for the data*)
+- **~8 GB** of RAM (*for processing large files*)
+- A stable internet connection (*for collecting labels and properties*)
 
 ### Step 1. Clone the repository
 
@@ -180,8 +166,6 @@ zelph --version
 ```
 
 💡 *If you want to use the prebuilt files from this repository's releases (or from Hugging Face), installing zelph is not required.*
-
----
 
 ## 🚀 Usage
 
