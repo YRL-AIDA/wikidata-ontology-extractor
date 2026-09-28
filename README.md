@@ -74,26 +74,23 @@ Data snapshot as of **2026**:
 
 ```text
 wikidata-ontology-extractor/
-├── data/                                             # 
-│   ├── class_schema_sample.json                      # 
-│   ├── class_schema_with_labels_and_descriptions.zip #
-│   ├── hierarchy_export.txt                          #
-│   └── properties_schema_with_labels.json            # 
+├── data/                                             # Данные проекта (результаты и промежуточные файлы)
+│   ├── class_schema_sample.json                      # Небольшая выборка классов для быстрого просмотра и отладки
+│   ├── class_schema_with_labels_and_descriptions.zip # Сжатая полная схема иерархии классов с названиями и описаниями на английском и русском языках
+│   ├── hierarchy_export.txt                          # Сырой экспорт иерархии классов (ребра подклассов) из zelph
+│   └── properties_schema_with_labels.json            # Полная схема свойств с названиями и описаниями на английском и русском языках
 │
-├── src/                                              # 
-│   ├── add_labels_and_descriptions.py                # 
-│   ├── extract_class_schema.py                       # 
-│   ├── extract_properties.py                         # 
-│   ├── inspect_class_schema.py                       # 
-│   └── wikidata-20260309-all-pruned-small-P279.bin   # 
+├── src/                                              # Исходный код проекта (скрипты извлечения и обработки)
+│   ├── add_labels_and_descriptions.py                # Добавление названий и описаний на английском и русском языках к классам через Wikidata API
+│   ├── extract_class_schema.py                       # Построение схемы иерархии классов из экспорта (фильтрация метаклассов, транзитивное замыкание)
+│   ├── extract_properties.py                         # Сбор схемы свойств (иерархия, domain/range-ограничения, обратные свойства) через Wikidata API
+│   ├── inspect_class_schema.py                       # Урезанный пример файла схемы иерархии классов (статистика, примеры, целостность)
+│   └── wikidata-20260309-all-pruned-small-P279.bin   # Исходный бинарный файл zelph с иерархией классов (входные данные) - требует отдельного скачивания
 │
-├── .gitignore                                        # 
-│
-├── LICENSE                                           # 
-│
-├── README.md                                         # 
-│
-└── requirements.txt                                  # 
+├── .gitignore                                        # Исключения системы контроля версий (кэши, временные файлы)
+├── LICENSE                                           # MIT-лицензия проекта
+├── README.md                                         # Основная документация проекта с инструкциями по установке и использованию
+└── requirements.txt                                  # Список Python-зависимостей проекта
 ```
 
 ## 🏗 Pipeline Architecture
@@ -256,6 +253,89 @@ This prints statistics, shows class examples with descriptions, and saves a smal
 Result: `data/class_schema_sample.json`
 
 ## 📄 Output Data Structure
+
+Example for `class_schema_with_labels_and_descriptions.json`:
+
+```json
+{
+  "edges": [
+    { "child": "Q5", "parent": "Q154954" },
+    { "child": "Q515", "parent": "Q486972" }
+  ],
+  "all_ancestors": {
+    "Q5": ["Q154954", "Q559618", "Q729", "Q35120"],
+    "Q515": ["Q486972", "Q56061", "Q35120"]
+  },
+  "class_info": {
+    "Q5": {
+      "label_en": "human",
+      "label_ru": "человек",
+      "description_en": "any member of Homo sapiens",
+      "description_ru": "представитель вида Homo sapiens"
+    },
+    "Q515": {
+      "label_en": "city",
+      "label_ru": "город",
+      "description_en": "large and permanent human settlement",
+      "description_ru": "крупный населённый пункт"
+    }
+  },
+  "stats": {
+    "total_edges": 669213,
+    "total_classes": 582467,
+    "root_classes": 4218,
+    "leaf_classes": 487305,
+    "metaclasses_removed": 307503
+  }
+}
+```
+
+Example for `properties_schema_with_labels.json`:
+
+```json
+{
+  "description": "Wikidata property ontological schema (EN + RU labels and descriptions)",
+  "stats": {
+    "total_properties": 13928,
+    "with_en_label": 13926,
+    "with_ru_label": 9066,
+    "with_hierarchy": 1048,
+    "with_domain": 9045,
+    "with_range": 1267,
+    "with_inverse": 208,
+    "total_domain_links": 23020,
+    "total_range_links": 6509
+  },
+  "properties": {
+    "P36": {
+      "id": "P36",
+      "label_en": "capital",
+      "label_ru": "столица",
+      "description_en": "capital city of the subject",
+      "description_ru": "столица или главный город объекта",
+      "datatype": "WikibaseItem",
+      "superproperties": ["P1376"],
+      "subproperties": [],
+      "domain": ["Q6256", "Q56061", "Q82794"],
+      "range": ["Q515", "Q486972"],
+      "inverse": "P1376"
+    },
+    "P31": {
+      "id": "P31",
+      "label_en": "instance of",
+      "label_ru": "это частный случай понятия",
+      "description_en": "that class of which this subject is a particular example and member",
+      "description_ru": "данный элемент является примером следующего класса",
+      "datatype": "WikibaseItem",
+      "superproperties": [],
+      "subproperties": ["P279"],
+      "domain": [],
+      "range": [],
+      "inverse": null
+    }
+  }
+}
+```
 
 ## ⚠ Limitations and Notes
 
